@@ -14,8 +14,11 @@ exports.register = async (req, res) => {
 
   const userData = {
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName
   }
+  console.log({ userData })
   user = await registerUser(userData)
 
   const token = user.generateAuthToken()
@@ -26,6 +29,8 @@ async function registerUser(userData) {
   const user = new User({
     email: userData.email,
     password: userData.password,
+    firstName: userData.firstName,
+    lastName: userData.lastName,
     socialId: userData.socialId || null
   })
 

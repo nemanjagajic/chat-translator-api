@@ -13,9 +13,21 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     maxlength: 1024
   },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
+  },
   socialId: {
     type: String,
     default: null
+  },
+  friends: {
+    type: Array,
+    default: []
   }
 })
 
