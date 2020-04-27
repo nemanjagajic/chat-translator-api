@@ -1,5 +1,15 @@
 const { User } = require('../models/user')
 
+exports.getAll = async (req, res) => {
+  try {
+    const user = await User
+      .findById(req.user._id)
+    res.send(user.friends)
+  } catch (err) {
+    res.status(400).send({ message: err.message })
+  }
+}
+
 exports.add = async (req, res) => {
   try {
     const user = await User
