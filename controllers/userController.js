@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     firstName: req.body.firstName,
     lastName: req.body.lastName
   }
-  console.log({ userData })
+
   user = await registerUser(userData)
 
   const token = user.generateAuthToken()
@@ -50,7 +50,7 @@ exports.login = async (req, res) => {
   if (!validPassword) return res.status(400).send({ message: 'Invalid email or password.' })
 
   const token = user.generateAuthToken()
-  res.send({ token, email: user.email })
+  res.send({ token, email: user.email, firstName: user.firstName, lastName: user.lastName })
 }
 
 exports.loginWithGoogle = async (req, res) => {
