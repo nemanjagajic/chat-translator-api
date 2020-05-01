@@ -12,15 +12,11 @@ exports.create = async (req, res) => {
     }
 
     const existingChatCombination1 = await Chat
-      .findOne()
-      .where('userOne._id').equals(user._id.toString())
-      .where('userTwo._id').equals(friend._id.toString())
+      .findOne({ users: [user, friend] })
       .exec()
 
     const existingChatCombination2 = await Chat
-      .findOne()
-      .where('userOne._id').equals(friend._id.toString())
-      .where('userTwo._id').equals(user._id.toString())
+      .findOne({ users: [friend, user] })
       .exec()
 
     if (existingChatCombination1 || existingChatCombination2) {
@@ -28,8 +24,7 @@ exports.create = async (req, res) => {
     }
 
     const chat = new Chat({
-      userOne: user,
-      userTwo: friend
+      users: [user, friend]
     })
     await chat.save()
     res.send(chat)

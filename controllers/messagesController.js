@@ -14,7 +14,7 @@ exports.sendMessage = async (req, res) => {
       return res.status(400).send({ message: `Chat with the given id doesn't exist` })
     }
 
-    const receiver = chat.userOne._id.toString() === user._id.toString() ? chat.userTwo : chat.userOne
+    const receiver = chat.users.find(u => u._id.toString() !== user._id.toString())
 
     let chatMessages = await ChatMessages
       .findOne()

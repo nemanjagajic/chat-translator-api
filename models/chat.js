@@ -16,14 +16,7 @@ const chatUserSchema = new mongoose.Schema({
 })
 
 const chatSchema = new mongoose.Schema({
-  userOne: {
-    type: chatUserSchema,
-    required: true
-  },
-  userTwo: {
-    type: chatUserSchema,
-    required: true
-  }
+  users: [chatUserSchema]
 })
 
 const Chat = mongoose.model('Chat', chatSchema)
