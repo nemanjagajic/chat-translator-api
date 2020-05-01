@@ -13,11 +13,9 @@ exports.create = async (req, res) => {
 
     const existingChatCombination1 = await Chat
       .findOne({ users: [user, friend] })
-      .exec()
 
     const existingChatCombination2 = await Chat
       .findOne({ users: [friend, user] })
-      .exec()
 
     if (existingChatCombination1 || existingChatCombination2) {
       return res.status(400).send({ message: `Chat with the given friend already exists` })
