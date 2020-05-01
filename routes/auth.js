@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const userController = require('../controllers/userController')
+const usersController = require('../controllers/usersController')
 const authMiddleware = require('../middleware/auth')
 
-router.post('/register', userController.register)
-router.post('/login', userController.login)
-router.post('/loginWithGoogle', userController.loginWithGoogle)
-router.get('/me', authMiddleware, userController.me)
+router.post('/register', usersController.register)
+router.post('/login', usersController.login)
+router.post('/loginWithGoogle', usersController.loginWithGoogle)
+router.get('/me', authMiddleware, usersController.me)
 
 module.exports = router
