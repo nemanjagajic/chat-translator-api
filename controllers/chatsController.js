@@ -11,13 +11,19 @@ exports.create = async (req, res) => {
       return res.status(400).send({ message: `Friend with the given id doesn't exist` })
     }
 
-    const existingChat = await Chat
+    const existingChatCombination1 = await Chat
       .findOne()
       .where('userOne._id').equals(user._id.toString())
       .where('userTwo._id').equals(friend._id.toString())
       .exec()
 
-    if (existingChat) {
+    const existingChatCombination2 = await Chat
+      .findOne()
+      .where('userOne._id').equals(friend._id.toString())
+      .where('userTwo._id').equals(user._id.toString())
+      .exec()
+
+    if (existingChatCombination1 || existingChatCombination2) {
       return res.status(400).send({ message: `Chat with the given friend already exists` })
     }
 
