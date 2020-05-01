@@ -49,7 +49,9 @@ function validateUser(user) {
     password: Joi.string()
       .min(8)
       .max(1024)
-      .required()
+      .required(),
+    firstName: Joi.string(),
+    lastName: Joi.string()
   }
 
   return Joi.validate(user, schema)
