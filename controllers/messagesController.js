@@ -28,6 +28,8 @@ exports.sendMessage = async (req, res) => {
       createdAt: new Date()
     })
     await collection.insertOne(message)
+    chat.lastMessageDate = message.createdAt
+    chat.save()
 
     res.send({ message })
   } catch (err) {

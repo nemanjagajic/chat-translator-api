@@ -16,7 +16,11 @@ const chatUserSchema = new mongoose.Schema({
 })
 
 const chatSchema = new mongoose.Schema({
-  users: [chatUserSchema]
+  users: [chatUserSchema],
+  lastMessageDate: {
+    type: Date,
+    default: new Date()
+  }
 })
 
 const Chat = mongoose.model('Chat', chatSchema)
