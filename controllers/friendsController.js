@@ -2,8 +2,7 @@ const { User } = require('../models/user')
 
 exports.getAll = async (req, res) => {
   try {
-    const user = await User
-      .findById(req.user._id)
+    const user = await User.findById(req.user._id)
     res.send(user.friends)
   } catch (err) {
     res.status(400).send({ message: err.message })
@@ -12,10 +11,8 @@ exports.getAll = async (req, res) => {
 
 exports.add = async (req, res) => {
   try {
-    const user = await User
-      .findById(req.user._id)
-    const friendToAdd = await User
-      .findById(req.body.userId)
+    const user = await User.findById(req.user._id)
+    const friendToAdd = await User.findById(req.body.userId)
 
     if (!friendToAdd) {
       return res.status(400).send({ message: `User with the given id doesn't exist` })
@@ -49,10 +46,8 @@ exports.add = async (req, res) => {
 
 exports.remove = async (req, res) => {
   try {
-    const user = await User
-      .findById(req.user._id)
-    const friendToRemove = await User
-      .findById(req.body.userId)
+    const user = await User.findById(req.user._id)
+    const friendToRemove = await User.findById(req.body.userId)
 
     if (!friendToRemove) {
       return res.status(400).send({ message: `User with the given id doesn't exist` })

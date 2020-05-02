@@ -1,10 +1,12 @@
 const { User } = require('../models/user')
 const { Chat } = require('../models/chat')
+const mongoose = require('mongoose')
+
+const db = mongoose.connection
 
 exports.create = async (req, res) => {
   try {
-    const user = await User
-      .findById(req.user._id)
+    const user = await User.findById(req.user._id)
     const friend = user.friends.find(f => f._id.toString() === req.body.userId.toString())
 
     if (!friend) {
@@ -26,6 +28,36 @@ exports.create = async (req, res) => {
     })
     await chat.save()
     res.send(chat)
+  } catch (err) {
+    res.status(400).send({ message: err.message })
+  }
+}
+
+exports.getAll = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+
+    const chatUser = {
+      _id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    }
+
+    const chats = await Chat.find({ users: { $elemMatch: chatUser } })
+    const chatsWithLastMessage = []
+    for (const chat of chats) {
+      const collection = await db.collection(`z_messages_${chat._id}`)
+      const lastMessage = await collection
+        .find()
+        .limit(1)
+        .sort('createdAt', -1)
+        .toArray()
+
+      chatsWithLastMessage.push({ _id: chat._id, users: chat.users, lastMessage: lastMessage[0] })
+    }
+
+    res.send(chatsWithLastMessage)
   } catch (err) {
     res.status(400).send({ message: err.message })
   }

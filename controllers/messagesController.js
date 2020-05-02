@@ -9,8 +9,7 @@ exports.sendMessage = async (req, res) => {
   const { chatId, text } = req.body
 
   try {
-    const user = await User
-      .findById(req.user._id)
+    const user = await User.findById(req.user._id)
     const chat = await Chat.findById(chatId);
 
     const error = checkChatAndUserPermissions(chat, user)
@@ -42,8 +41,7 @@ exports.getAll = async (req, res) => {
   const limit = parseInt(req.query.limit)
 
   try {
-    const user = await User
-      .findById(req.user._id)
+    const user = await User.findById(req.user._id)
     const chat = await Chat.findById(chatId)
 
     const error = checkChatAndUserPermissions(chat, user)
