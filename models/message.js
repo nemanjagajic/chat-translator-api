@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const messageSchema = new mongoose.Schema({
+  chatId: {
+    type: String,
+    required: true
+  },
   text: {
     type: String,
     required: true
@@ -19,16 +23,7 @@ const messageSchema = new mongoose.Schema({
   }
 })
 
-const chatMessagesSchema = new mongoose.Schema({
-  chatId: {
-    type: String,
-    required: true
-  },
-  messages: [messageSchema]
-})
-
 const Message = mongoose.model('Message', messageSchema)
-const ChatMessages = mongoose.model('ChatMessages', chatMessagesSchema)
 
 exports.Message = Message
-exports.ChatMessages = ChatMessages
+exports.messageSchema = messageSchema

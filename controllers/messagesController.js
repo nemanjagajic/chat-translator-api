@@ -1,6 +1,9 @@
 const { Chat } = require('../models/chat')
-const { ChatMessages, Message } = require('../models/message')
+const { Message, messageSchema } = require('../models/message')
 const { User } = require('../models/user')
+const mongoose = require('mongoose')
+
+const db = mongoose.connection
 
 exports.sendMessage = async (req, res) => {
   const { chatId, text } = req.body
@@ -10,34 +13,24 @@ exports.sendMessage = async (req, res) => {
       .findById(req.user._id)
     const chat = await Chat.findById(chatId);
 
-    if (!chat) {
-      return res.status(400).send({ message: `Chat with the given id doesn't exist` })
+    const error = checkChatAndUserPermissions(chat, user)
+    if (error) {
+      return res.status(error.code).send({ message: error.message })
     }
 
     const receiver = chat.users.find(u => u._id.toString() !== user._id.toString())
 
-    let chatMessages = await ChatMessages
-      .findOne()
-      .where('chatId').equals(chatId.toString())
-    if (!chatMessages) {
-      chatMessages = ChatMessages({
-        chatId,
-        messages: []
-      })
-      await chatMessages.save()
-    }
-
+    const collection = await db.collection(`z_messages_${chatId}`)
     const message = new Message({
+      chatId,
       text,
       senderId: user._id,
       receiverId: receiver._id,
       createdAt: new Date()
     })
-    chatMessages.messages.push(message)
-    await chatMessages.save()
+    await collection.insertOne(message)
 
-    const responseMessage = `Message successfully sent`
-    res.send({ message: responseMessage })
+    res.send({ message })
   } catch (err) {
     res.status(400).send({ message: err.message })
   }
@@ -53,19 +46,34 @@ exports.getAll = async (req, res) => {
       .findById(req.user._id)
     const chat = await Chat.findById(chatId)
 
-    const foundUser = chat.users.find(u => u._id.toString() === user._id.toString())
-    if (!foundUser) {
-      return res.status(401).send({ message: `You are not a participant of this chat` })
+    const error = checkChatAndUserPermissions(chat, user)
+    if (error) {
+      return res.status(error.code).send({ message: error.message })
     }
 
-    const chatMessages = await ChatMessages
-      .findOne()
-      .where('chatId').equals(chatId.toString())
-      .select(['messages'])
+    const collection = await db.collection(`z_messages_${chatId}`)
+    const messages = await collection
+      .find()
+      .limit(limit)
+      .skip(offset * limit)
+      .sort('createdAt', -1)
+      .toArray()
 
-    const messages = chatMessages.messages.slice(offset, offset + limit)
     res.send(messages)
   } catch (err) {
     res.status(400).send({ message: err.message })
   }
+}
+
+const checkChatAndUserPermissions = (chat, user) => {
+  if (!chat) {
+    return { code: 400, message: `Chat with the given id doesn't exist` }
+  }
+
+  const foundUser = chat.users.find(u => u._id.toString() === user._id.toString())
+  if (!foundUser) {
+    return { code: 401, message: 'You are not a participant of this chat' }
+  }
+
+  return null
 }
