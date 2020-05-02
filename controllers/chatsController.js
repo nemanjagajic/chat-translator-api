@@ -54,7 +54,13 @@ exports.getAll = async (req, res) => {
         .sort('createdAt', -1)
         .toArray()
 
-      chatsWithLastMessage.push({ _id: chat._id, users: chat.users, lastMessage: lastMessage[0] })
+      const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
+
+      chatsWithLastMessage.push({
+        _id: chat._id,
+        friend,
+        lastMessage: lastMessage[0]
+      })
     }
 
     res.send(chatsWithLastMessage)
