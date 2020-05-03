@@ -15,11 +15,24 @@ const chatUserSchema = new mongoose.Schema({
   }
 })
 
+const lastMessageSchema = new mongoose.Schema({
+  text: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    required: true
+  }
+})
+
 const chatSchema = new mongoose.Schema({
   users: [chatUserSchema],
-  lastMessageDate: {
-    type: Date,
-    default: new Date()
+  lastMessage: {
+    type: lastMessageSchema,
+    default: {
+      text: null,
+      createdAt: new Date()
+    }
   }
 })
 

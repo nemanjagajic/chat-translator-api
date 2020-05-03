@@ -45,24 +45,18 @@ exports.getAll = async (req, res) => {
     }
 
     const chats = await Chat
-      .find({ users: { $elemMatch: chatUser } })
-      .sort('-lastMessageDate')
+      .find({ users: { $elemMatch: chatUser }, 'lastMessage.text' :{ $ne:null } })
+      .where()
+      .sort('-lastMessage.createdAt')
 
     const chatsWithLastMessage = []
     for (const chat of chats) {
-      const collection = await db.collection(`z_messages_${chat._id}`)
-      const lastMessage = await collection
-        .find()
-        .limit(1)
-        .sort('createdAt', -1)
-        .toArray()
-
       const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
 
       chatsWithLastMessage.push({
         _id: chat._id,
-        friend,
-        lastMessage: lastMessage[0]
+        lastMessage: chat.lastMessage,
+        friend
       })
     }
 
