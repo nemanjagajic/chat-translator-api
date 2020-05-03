@@ -49,18 +49,18 @@ exports.getAll = async (req, res) => {
       .where()
       .sort('-lastMessage.createdAt')
 
-    const chatsWithLastMessage = []
+    const chatsWithFriends = []
     for (const chat of chats) {
       const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
 
-      chatsWithLastMessage.push({
+      chatsWithFriends.push({
         _id: chat._id,
         lastMessage: chat.lastMessage,
         friend
       })
     }
 
-    res.send(chatsWithLastMessage)
+    res.send(chatsWithFriends)
   } catch (err) {
     res.status(400).send({ message: err.message })
   }
