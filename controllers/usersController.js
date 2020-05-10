@@ -86,3 +86,23 @@ exports.me = async (req, res) => {
     res.status(400).send({ message: err.message })
   }
 }
+
+exports.addSocketToUser = async data => {
+  try {
+    const { userId, socketId } = data
+    let user = await User.findById(userId)
+    user.socketId = socketId
+    await user.save()
+    return user
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+exports.findUserById = async userId => {
+  try {
+    return User.findById(userId)
+  } catch (err) {
+    console.log(err)
+  }
+}

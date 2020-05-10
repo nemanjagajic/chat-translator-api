@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const socket = require('socket.io')
+const usersController = require('./controllers/usersController')
 require('dotenv').config()
 
 require('./startup/cors')(app)
@@ -14,11 +15,15 @@ const server = app.listen(port, () =>
 
 const io = socket(server)
 io.on('connection', socket => {
-  console.log(`Made socket connection ${socket.id}`)
+  socket.on('createUserSession', data => {
+    usersController.addSocketToUser(data)
+  })
 
-  socket.on('chatMessageSent', message => {
-    console.log({ message })
-    socket.broadcast.emit('loadMessage', message)
+  socket.on('chatMessageSent', async message => {
+    const receiver = await usersController.findUserById(message.receiverId)
+    if (receiver.socketId) {
+      socket.broadcast.to(receiver.socketId).emit('loadMessage', message)
+    }
   })
 })
 

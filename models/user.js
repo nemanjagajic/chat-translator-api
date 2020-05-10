@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
   friends: {
     type: Array,
     default: []
+  },
+  socketId: {
+    type: String
   }
 })
 
