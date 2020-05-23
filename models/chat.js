@@ -12,7 +12,10 @@ const chatUserSchema = new mongoose.Schema({
   lastName: {
     type: String,
     required: true
-  }
+  },
+  showOriginalMessages: Boolean,
+  sendLanguage: String,
+  receiveLanguage: String
 })
 
 const lastMessageSchema = new mongoose.Schema({

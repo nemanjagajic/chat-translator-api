@@ -10,14 +10,13 @@ const projectId = process.env.GOOGLE_PROJECT_ID
 const location = 'global'
 
 const translationClient = new TranslationServiceClient()
-async function translateText(text) {
-  console.log(projectId)
+async function translateText(text, sourceLanguageCode, targetLanguageCode) {
   const request = {
     parent: `projects/${projectId}/locations/${location}`,
     contents: [text],
     mimeType: 'text/plain',
-    sourceLanguageCode: 'en',
-    targetLanguageCode: 'sr-Latn',
+    sourceLanguageCode,
+    targetLanguageCode,
   }
 
   try {
@@ -40,14 +39,19 @@ exports.sendMessage = async (req, res) => {
       return res.status(error.code).send({ message: error.message })
     }
 
+    const sender = chat.users.find(u => u._id.toString() === user._id.toString())
     const receiver = chat.users.find(u => u._id.toString() !== user._id.toString())
 
     const collection = await db.collection(`z_messages_${chatId}`)
-    const textSr = await translateText(text)
+    const textTranslated = await translateText(
+      text,
+      sender.sendLanguage,
+      receiver.receiveLanguage
+    )
     const message = new Message({
       chatId,
       text,
-      textSr,
+      textTranslated,
       senderId: user._id,
       receiverId: receiver._id,
       createdAt: new Date()
@@ -57,7 +61,7 @@ exports.sendMessage = async (req, res) => {
     chat.lastMessage = {
       _id: message._id,
       text: message.text,
-      textSr: textSr,
+      textTranslated,
       createdAt: message.createdAt
     }
     chat.save()

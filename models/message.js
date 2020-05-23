@@ -9,7 +9,7 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  textSr: {
+  textTranslated: {
     type: String,
     required: true
   },

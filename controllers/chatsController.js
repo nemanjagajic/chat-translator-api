@@ -49,18 +49,44 @@ exports.getAll = async (req, res) => {
       .where()
       .sort('-lastMessage.createdAt')
 
-    const chatsWithFriends = []
+    const chatsWithUsers = []
     for (const chat of chats) {
       const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
+      const me = chat.users.find(u => u._id.toString() === user._id.toString())
 
-      chatsWithFriends.push({
+      chatsWithUsers.push({
         _id: chat._id,
         lastMessage: chat.lastMessage,
-        friend
+        friend,
+        me
       })
     }
 
-    res.send(chatsWithFriends)
+    res.send(chatsWithUsers)
+  } catch (err) {
+    res.status(400).send({ message: err.message })
+  }
+}
+
+exports.setSettingsProperty = async (req, res) => {
+  try {
+    const { property, value } = req.body
+    if (!['showOriginalMessages', 'sendLanguage', 'receiveLanguage'].includes(property)) {
+      res.status(400).send({
+        message: `Wrong property. Available ones are: "showOriginalMessages", "setLanguage", "receiveLanguage"`
+      })
+    }
+
+    const user = await User.findById(req.user._id)
+    const chat = await Chat.findById(req.body.chatId)
+
+    if (!chat) res.status(404).send({ message: `Chat with the given id doesn't exist` })
+    const me = chat.users.find(u => u._id.toString() === user._id.toString())
+    if (!me) return res.status(401).send({ message: `You are not a member of this chat` })
+
+    me[property] = value
+    await chat.save()
+    res.send(chat)
   } catch (err) {
     res.status(400).send({ message: err.message })
   }
