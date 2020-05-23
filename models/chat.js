@@ -23,7 +23,10 @@ const chatUserSchema = new mongoose.Schema({
 
 const lastMessageSchema = new mongoose.Schema({
   text: {
-    type: String,
+    type: String
+  },
+  textTranslated: {
+    type: String
   },
   createdAt: {
     type: Date,

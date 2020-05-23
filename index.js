@@ -25,6 +25,16 @@ io.on('connection', socket => {
       socket.broadcast.to(receiver.socketId).emit('loadMessage', message)
     }
   })
+
+  socket.on('chatSettingChanged', async data => {
+    const friend = await usersController.findUserById(data.friend._id)
+    if (friend.socketId) {
+      socket.broadcast.to(friend.socketId).emit('loadChatSettings', {
+        chatId: data._id,
+        friend: data.me
+      })
+    }
+  })
 })
 
 module.exports = server
