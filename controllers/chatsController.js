@@ -2,8 +2,6 @@ const { User } = require('../models/user')
 const { Chat } = require('../models/chat')
 const mongoose = require('mongoose')
 
-const db = mongoose.connection
-
 exports.create = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
@@ -82,11 +80,16 @@ exports.setSettingsProperty = async (req, res) => {
 
     if (!chat) res.status(404).send({ message: `Chat with the given id doesn't exist` })
     const me = chat.users.find(u => u._id.toString() === user._id.toString())
+    const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
     if (!me) return res.status(401).send({ message: `You are not a member of this chat` })
 
     me[property] = value
     await chat.save()
-    res.send(chat)
+    res.send({
+      _id: chat._id,
+      me,
+      friend
+    })
   } catch (err) {
     res.status(400).send({ message: err.message })
   }

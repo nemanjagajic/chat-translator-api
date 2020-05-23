@@ -13,7 +13,10 @@ const chatUserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  showOriginalMessages: Boolean,
+  showOriginalMessages: {
+    type: Boolean,
+    default: true
+  },
   sendLanguage: String,
   receiveLanguage: String
 })
