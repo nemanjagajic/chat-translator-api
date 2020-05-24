@@ -35,6 +35,24 @@ io.on('connection', socket => {
       })
     }
   })
+
+  socket.on('startedTyping', async data => {
+    const friend = await usersController.findUserById(data.friendId)
+    if (friend.socketId) {
+      socket.broadcast.to(friend.socketId).emit('friendStartedTyping', {
+        chatId: data.chatId
+      })
+    }
+  })
+
+  socket.on('stoppedTyping', async data => {
+    const friend = await usersController.findUserById(data.friendId)
+    if (friend.socketId) {
+      socket.broadcast.to(friend.socketId).emit('friendStoppedTyping', {
+        chatId: data.chatId
+      })
+    }
+  })
 })
 
 module.exports = server
