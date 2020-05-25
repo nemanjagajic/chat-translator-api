@@ -94,3 +94,20 @@ exports.setSettingsProperty = async (req, res) => {
     res.status(400).send({ message: err.message })
   }
 }
+
+exports.setChatVisited = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    const chat = await Chat.findById(req.body.chatId)
+
+    if (!chat) res.status(404).send({ message: `Chat with the given id doesn't exist` })
+    const me = chat.users.find(u => u._id.toString() === user._id.toString())
+    if (!me) return res.status(401).send({ message: `You are not a member of this chat` })
+
+    me.lastVisit = new Date()
+    await chat.save()
+    res.send(chat)
+  } catch (err) {
+    res.status(400).send({ message: err.message })
+  }
+}

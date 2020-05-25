@@ -18,7 +18,8 @@ const chatUserSchema = new mongoose.Schema({
     default: true
   },
   sendLanguage: String,
-  receiveLanguage: String
+  receiveLanguage: String,
+  lastVisit: Date
 })
 
 const lastMessageSchema = new mongoose.Schema({
