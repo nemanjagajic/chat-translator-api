@@ -62,7 +62,8 @@ exports.sendMessage = async (req, res) => {
       _id: message._id,
       text: message.text,
       textTranslated,
-      createdAt: message.createdAt
+      createdAt: message.createdAt,
+      senderId: sender._id
     }
     chat.save()
 

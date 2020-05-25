@@ -32,6 +32,9 @@ const lastMessageSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     required: true
+  },
+  senderId: {
+    type: String
   }
 })
 
