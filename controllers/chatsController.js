@@ -1,6 +1,5 @@
 const { User } = require('../models/user')
 const { Chat } = require('../models/chat')
-const mongoose = require('mongoose')
 
 exports.create = async (req, res) => {
   try {
