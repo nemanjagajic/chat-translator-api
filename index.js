@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const socket = require('socket.io')
 const usersController = require('./controllers/usersController')
+const chatsController = require('./controllers/chatsController')
 require('dotenv').config()
 
 require('./startup/cors')(app)
@@ -50,6 +51,19 @@ io.on('connection', socket => {
     if (friend.socketId) {
       socket.broadcast.to(friend.socketId).emit('friendStoppedTyping', {
         chatId: data.chatId
+      })
+    }
+  })
+
+  socket.on('friendVisitedChat', async data => {
+    const chat = await chatsController.findById(data.chatId)
+    const chatMe = chat.users.find(u => u._id.toString() === data.userId.toString())
+    const chatFriend = chat.users.find(u => u._id.toString() !== data.userId.toString())
+    const friend = await usersController.findUserById(chatFriend._id)
+    if (friend.socketId) {
+      socket.broadcast.to(friend.socketId).emit('updateFriendVisitData', {
+        chatId: data.chatId,
+        newLastVisit: chatMe.lastVisit
       })
     }
   })

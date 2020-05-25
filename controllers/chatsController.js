@@ -111,3 +111,11 @@ exports.setChatVisited = async (req, res) => {
     res.status(400).send({ message: err.message })
   }
 }
+
+exports.findById = async id => {
+  try {
+    return Chat.findById(id)
+  } catch (error) {
+    console.log(error)
+  }
+}
