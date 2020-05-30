@@ -99,6 +99,17 @@ exports.addSocketToUser = async data => {
   }
 }
 
+exports.registerNotificationToken = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    user.notificationToken = req.body.token
+    await user.save()
+    res.send(user)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 exports.findUserById = async userId => {
   try {
     return User.findById(userId)

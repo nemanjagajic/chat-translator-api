@@ -7,5 +7,6 @@ router.post('/register', usersController.register)
 router.post('/login', usersController.login)
 router.post('/loginWithGoogle', usersController.loginWithGoogle)
 router.get('/me', authMiddleware, usersController.me)
+router.post('/registerNotificationToken', authMiddleware, usersController.registerNotificationToken)
 
 module.exports = router

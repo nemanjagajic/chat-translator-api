@@ -13,6 +13,7 @@
     "cors": "^2.8.5",
     "crypto-random-string": "^3.2.0",
     "dotenv": "^8.2.0",
+    "expo-server-sdk": "^3.5.0",
     "express": "^4.17.1",
     "googleapis": "^47.0.0",
     "joi": "^14.3.1",

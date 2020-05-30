@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
   },
   socketId: {
     type: String
+  },
+  notificationToken: {
+    type: String
   }
 })
 

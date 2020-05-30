@@ -2,7 +2,10 @@ const { Chat } = require('../models/chat')
 const { Message } = require('../models/message')
 const { User } = require('../models/user')
 const { TranslationServiceClient } = require('@google-cloud/translate')
+const { Expo } = require('expo-server-sdk')
+const usersController = require('./usersController')
 const mongoose = require('mongoose')
+const expo = new Expo();
 
 const db = mongoose.connection
 
@@ -10,22 +13,6 @@ const projectId = process.env.GOOGLE_PROJECT_ID
 const location = 'global'
 
 const translationClient = new TranslationServiceClient()
-async function translateText(text, sourceLanguageCode, targetLanguageCode) {
-  const request = {
-    parent: `projects/${projectId}/locations/${location}`,
-    contents: [text],
-    mimeType: 'text/plain',
-    sourceLanguageCode,
-    targetLanguageCode,
-  }
-
-  try {
-    const [ response ] = await translationClient.translateText(request)
-    return response.translations[0].translatedText
-  } catch (error) {
-    console.error(error)
-  }
-}
 
 exports.sendMessage = async (req, res) => {
   const { chatId, text } = req.body
@@ -67,9 +54,42 @@ exports.sendMessage = async (req, res) => {
     }
     chat.save()
 
+    await sendPushNotification(receiver, message)
+
     res.send({ message })
   } catch (err) {
     res.status(400).send({ message: err.message })
+  }
+}
+
+const translateText = async (text, sourceLanguageCode, targetLanguageCode) => {
+  const request = {
+    parent: `projects/${projectId}/locations/${location}`,
+    contents: [text],
+    mimeType: 'text/plain',
+    sourceLanguageCode,
+    targetLanguageCode,
+  }
+
+  try {
+    const [ response ] = await translationClient.translateText(request)
+    return response.translations[0].translatedText
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const sendPushNotification = async (receiver, message) => {
+  const user = await usersController.findUserById(receiver._id)
+  console.log({ user })
+  if (user && Expo.isExpoPushToken(user.notificationToken)) {
+    await expo.sendPushNotificationsAsync([{
+      to: user.notificationToken,
+      sound: 'default',
+      title: `${user.firstName} ${user.lastName}`,
+      body: message.textTranslated,
+      data: { withSome: 'data' },
+    }])
   }
 }
 
