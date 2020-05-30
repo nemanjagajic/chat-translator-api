@@ -54,7 +54,8 @@ exports.sendMessage = async (req, res) => {
     }
     chat.save()
 
-    await sendPushNotification(receiver, message)
+    const chatData = { _id: chatId, me: sender, friend: receiver }
+    await sendPushNotification(receiver, message, chatData)
 
     res.send({ message })
   } catch (err) {
@@ -79,16 +80,15 @@ const translateText = async (text, sourceLanguageCode, targetLanguageCode) => {
   }
 }
 
-const sendPushNotification = async (receiver, message) => {
+const sendPushNotification = async (receiver, message, chat) => {
   const user = await usersController.findUserById(receiver._id)
-  console.log({ user })
   if (user && Expo.isExpoPushToken(user.notificationToken)) {
     await expo.sendPushNotificationsAsync([{
       to: user.notificationToken,
       sound: 'default',
       title: `${user.firstName} ${user.lastName}`,
       body: message.textTranslated,
-      data: { withSome: 'data' },
+      data: { chat },
     }])
   }
 }
