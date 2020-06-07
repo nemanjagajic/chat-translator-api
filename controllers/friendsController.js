@@ -49,10 +49,11 @@ exports.sendFriendRequest = async (req, res) => {
   }
 }
 
-exports.acceptFriendRequest = async (req, res) => {
+exports.respondToFriendRequest = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
     const friendToAdd = await User.findById(req.body.userId)
+    const accept = req.body.accept
 
     if (!friendToAdd) {
       return res.status(400).send({ message: `User with the given id doesn't exist` })
@@ -67,23 +68,25 @@ exports.acceptFriendRequest = async (req, res) => {
       return res.status(400).send({ message: `${friendToAdd.firstName} ${friendToAdd.lastName} already added as a friend` })
     }
 
-    user.friends.push({
-      _id: friendToAdd._id,
-      email: friendToAdd.email,
-      firstName: friendToAdd.firstName,
-      lastName: friendToAdd.lastName
-    })
+    if (accept) {
+      user.friends.push({
+        _id: friendToAdd._id,
+        email: friendToAdd.email,
+        firstName: friendToAdd.firstName,
+        lastName: friendToAdd.lastName
+      })
+      friendToAdd.friends.push({
+        _id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      })
+    }
     user.friendRequests = user.friendRequests.filter(fr => fr._id.toString() !== friendToAdd._id.toString())
-    friendToAdd.friends.push({
-      _id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName
-    })
     friendToAdd.friendRequests = friendToAdd.friendRequests.filter(fr => fr._id.toString() !== user._id.toString())
     user.save()
     friendToAdd.save()
-    const message = `Successfully added ${friendToAdd.firstName} ${friendToAdd.lastName} as a friend`
+    const message = `Successfully ${accept ? 'added' : 'declined'} ${friendToAdd.firstName} ${friendToAdd.lastName} as a friend`
     res.send({ message })
   } catch (err) {
     res.status(400).send({ message: err.message })
