@@ -18,6 +18,10 @@ exports.sendFriendRequest = async (req, res) => {
       return res.status(400).send({ message: `User with the given id doesn't exist` })
     }
 
+    const friendRequest = user.friendRequests.find(fr => fr._id.toString() === friendToAdd._id.toString())
+    if (friendRequest) return res.status(400).send({ message: `You've already sent friend request to this user` })
+
+
     const foundFriend = user.friends.find(friend => friend._id.toString() === req.body.userId.toString())
     if (foundFriend) {
       return res.status(400).send({ message: `${friendToAdd.firstName} ${friendToAdd.lastName} already added as a friend` })
