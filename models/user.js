@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
+  friendRequests: {
+    type: Array,
+    default: []
+  },
   socketId: {
     type: String
   },
