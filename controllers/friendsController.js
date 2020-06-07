@@ -61,7 +61,7 @@ exports.respondToFriendRequest = async (req, res) => {
 
     const friendRequest = user.friendRequests.find(fr => fr._id.toString() === friendToAdd._id.toString())
     if (!friendRequest) return res.status(400).send({ message: `User didn't send you friend request` })
-    if (friendRequest.requestedByMe) return res.status(400).send({ message: `You cannot accept your own friend request, come on man...` })
+    if (friendRequest.requestedByMe && accept) return res.status(400).send({ message: `You cannot accept your own friend request, come on man...` })
 
     const foundFriend = user.friends.find(friend => friend._id.toString() === req.body.userId.toString())
     if (foundFriend) {
@@ -107,8 +107,8 @@ exports.remove = async (req, res) => {
       return res.status(400).send({ message: `${friendToRemove.firstName} ${friendToRemove.lastName} is not a friend` })
     }
 
+    const friendsIndexOfMe = friendToRemove.friends.findIndex(friend => friend._id.toString() === user._id.toString())
     user.friends.splice(foundFriendIndex, 1)
-    const friendsIndexOfMe = user.friends.findIndex(friend => friend._id.toString() === req.user._id)
     friendToRemove.friends.splice(friendsIndexOfMe, 1)
     user.save()
     friendToRemove.save()
