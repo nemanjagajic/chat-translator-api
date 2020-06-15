@@ -121,17 +121,27 @@ exports.remove = async (req, res) => {
 
 exports.searchUser = async (req, res) => {
   try {
+    const user = await User.findById(req.user._id)
     const text = req.query.text
     const offset = parseInt(req.query.offset)
     const limit = parseInt(req.query.limit)
 
-    const result = await User.find({ $or: [
+    const users = await User.find({ $or: [
         {firstName: new RegExp('^' + text, 'i')},
         {lastName: new RegExp('^' + text, 'i')},
         {email: new RegExp('^' + text, 'i')}
       ]})
       .limit(limit)
       .skip(offset * limit)
+      .select(['firstName', 'lastName', 'email', 'friends'])
+
+    const result = users.map(u => ({
+      _id: u._id,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      email: u.email,
+      isFriend: !!u.friends.find(f => f._id.toString() === user._id.toString())
+    }))
 
     res.send(result)
   } catch (err) {
