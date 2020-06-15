@@ -118,3 +118,23 @@ exports.remove = async (req, res) => {
     res.status(400).send({ message: err.message })
   }
 }
+
+exports.searchUser = async (req, res) => {
+  try {
+    const text = req.query.text
+    const offset = parseInt(req.query.offset)
+    const limit = parseInt(req.query.limit)
+
+    const result = await User.find({ $or: [
+        {firstName: new RegExp('^' + text, 'i')},
+        {lastName: new RegExp('^' + text, 'i')},
+        {email: new RegExp('^' + text, 'i')}
+      ]})
+      .limit(limit)
+      .skip(offset * limit)
+
+    res.send(result)
+  } catch (err) {
+    console.log(err)
+  }
+}
