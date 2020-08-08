@@ -42,7 +42,7 @@ exports.getAll = async (req, res) => {
     }
 
     const chats = await Chat
-      .find({ users: { $elemMatch: chatUser }, 'lastMessage.text' :{ $ne:null } })
+      .find({ users: { $elemMatch: chatUser }})
       .where()
       .sort('-lastMessage.createdAt')
 

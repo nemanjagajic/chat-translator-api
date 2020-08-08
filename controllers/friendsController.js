@@ -126,16 +126,21 @@ exports.searchUser = async (req, res) => {
     const offset = parseInt(req.query.offset)
     const limit = parseInt(req.query.limit)
 
-    const users = await User.find({ $or: [
-        {firstName: new RegExp('^' + text, 'i')},
-        {lastName: new RegExp('^' + text, 'i')},
-        {email: new RegExp('^' + text, 'i')}
+    const textTokens = text.split(' ')
+    const firstNameToken = textTokens[0] && !textTokens[0].includes('@') ? textTokens[0] : ''
+    const lastNameToken = textTokens[1] ? textTokens[1] : ''
+    const emailToken = textTokens[0] && textTokens[0].includes('@') ? textTokens[0] : ''
+
+    const users = await User.find({ $and: [
+        {firstName: new RegExp('^' + firstNameToken, 'i')},
+        {lastName: new RegExp('^' + lastNameToken, 'i')},
+        {email: new RegExp('^' + emailToken, 'i')}
       ]})
       .limit(limit)
       .skip(offset * limit)
       .select(['firstName', 'lastName', 'email', 'friends'])
 
-    const result = users.map(u => ({
+    const result = users.slice(0, 50).map(u => ({
       _id: u._id,
       firstName: u.firstName,
       lastName: u.lastName,
