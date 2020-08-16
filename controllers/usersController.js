@@ -26,7 +26,6 @@ exports.register = async (req, res) => {
 }
 
 async function registerUser(userData) {
-  console.log(userData)
   const user = new User({
     email: userData.email,
     password: userData.password,
