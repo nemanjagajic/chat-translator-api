@@ -26,6 +26,7 @@ exports.register = async (req, res) => {
 }
 
 async function registerUser(userData) {
+  console.log(userData)
   const user = new User({
     email: userData.email,
     password: userData.password,
@@ -56,21 +57,24 @@ exports.login = async (req, res) => {
 exports.loginWithGoogle = async (req, res) => {
   const accessToken = req.body.accessToken
   try {
-    const { data } = await axios.get(`${VALIDATE_ACCESS_TOKEN_URL}${accessToken}`)
-    let user = await User.findOne({ socialId: data.user_id })
+    const { data: { email, given_name, family_name, id } } = await axios.get(`${VALIDATE_ACCESS_TOKEN_URL}${accessToken}`)
+    let user = await User.findOne({ socialId: id })
 
     if (!user) {
       const generatedPassword = cryptoRandomString({length: PASSWORD_LENGTH, type: 'base64'})
       const userData = {
-        email: data.email,
+        email,
         password: generatedPassword,
-        socialId: data.user_id
+        firstName: given_name,
+        lastName: family_name,
+        socialId: id
       }
       user = await registerUser(userData)
     }
 
     const token = user.generateAuthToken()
-    res.send({ token, email: data.email })
+    const { _id, firstName, lastName } = user
+    res.send({ token, _id, email, firstName, lastName })
   } catch (err) {
     res.status(400).send({ message: err.message })
   }
