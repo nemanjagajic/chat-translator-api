@@ -131,8 +131,11 @@ exports.updateUser = async (req, res) => {
     const userAvatarFolder = `./avatarImages/${user._id}`
     const { path, name } = req.files.avatar
 
-    if (!fs.existsSync(userAvatarFolder)) fs.mkdirSync(userAvatarFolder)
-    fsExtra.emptyDirSync(userAvatarFolder)
+    if (!fs.existsSync(userAvatarFolder)) {
+      fs.mkdirSync(userAvatarFolder)
+    } else {
+      fsExtra.emptyDirSync(userAvatarFolder)
+    }
 
     await sharp(path)
       .resize(AVATAR_HEIGHT, AVATAR_WIDTH)
