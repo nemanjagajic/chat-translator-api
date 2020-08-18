@@ -1,1 +1,3 @@
 exports.PASSWORD_LENGTH = 256
+exports.AVATAR_HEIGHT = 300
+exports.AVATAR_WIDTH = 300

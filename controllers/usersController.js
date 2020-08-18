@@ -1,7 +1,11 @@
 const { User, validate } = require('../models/user')
 const bcrypt = require('bcrypt')
 const axios = require('axios')
+const fs = require('fs')
+const fsExtra = require('fs-extra')
+const sharp = require('sharp')
 const cryptoRandomString = require('crypto-random-string')
+const { AVATAR_HEIGHT, AVATAR_WIDTH } = require('../constants/userConstants')
 const { VALIDATE_ACCESS_TOKEN_URL } = require('../constants/googleConstants')
 const { PASSWORD_LENGTH } = require('../constants/userConstants')
 
@@ -116,6 +120,25 @@ exports.registerNotificationToken = async (req, res) => {
 exports.findUserById = async userId => {
   try {
     return User.findById(userId)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+exports.updateUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    const userAvatarFolder = `./avatarImages/${user._id}`
+    const { path, name } = req.files.avatar
+
+    if (!fs.existsSync(userAvatarFolder)) fs.mkdirSync(userAvatarFolder)
+    fsExtra.emptyDirSync(userAvatarFolder)
+
+    await sharp(path)
+      .resize(AVATAR_HEIGHT, AVATAR_WIDTH)
+      .toFile(`${userAvatarFolder}/${name}`)
+
+    res.send('Done')
   } catch (err) {
     console.log(err)
   }
