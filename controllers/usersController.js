@@ -129,10 +129,8 @@ exports.updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
     const userAvatarName = `./avatarImages/${user._id}`
-    const { path, name } = req.files.avatar
-    const nameTokens = name.split('.')
-    const extension = nameTokens[nameTokens.length - 1]
-    const userAvatarFileName = `${userAvatarName}.${extension}`
+    const { path } = req.files.avatar
+    const userAvatarFileName = `${userAvatarName}.jpg`
 
     await sharp(path)
       .resize(AVATAR_HEIGHT, AVATAR_WIDTH)
