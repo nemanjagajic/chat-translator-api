@@ -125,6 +125,7 @@ exports.findUserById = async userId => {
   }
 }
 
+// Not used at the moment
 exports.updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
