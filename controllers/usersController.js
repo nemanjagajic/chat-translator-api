@@ -128,20 +128,18 @@ exports.findUserById = async userId => {
 exports.updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-    const userAvatarFolder = `./avatarImages/${user._id}`
+    const userAvatarName = `./avatarImages/${user._id}`
     const { path, name } = req.files.avatar
-
-    if (!fs.existsSync(userAvatarFolder)) {
-      fs.mkdirSync(userAvatarFolder)
-    } else {
-      fsExtra.emptyDirSync(userAvatarFolder)
-    }
+    const nameTokens = name.split('.')
+    const extension = nameTokens[nameTokens.length - 1]
+    const userAvatarFileName = `${userAvatarName}.${extension}`
 
     await sharp(path)
       .resize(AVATAR_HEIGHT, AVATAR_WIDTH)
-      .toFile(`${userAvatarFolder}/${name}`)
+      .toFile(userAvatarFileName)
 
-    res.send('Done')
+    const message = `Successfully uploaded image ${userAvatarFileName}`
+    res.send({ message })
   } catch (err) {
     console.log(err)
   }

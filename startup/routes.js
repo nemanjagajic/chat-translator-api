@@ -6,6 +6,7 @@ const messages = require('../routes/messages')
 
 module.exports = app => {
   app.use(express.json())
+  app.use('/avatarImages', express.static(process.cwd() + '/avatarImages'))
   app.use('/api/auth', auth)
   app.use('/api/friends', friends)
   app.use('/api/chats', chats)
