@@ -1,4 +1,8 @@
 const { User } = require('../models/user')
+const usersController = require('./usersController')
+const { Expo } = require('expo-server-sdk')
+const expo = new Expo();
+
 
 exports.getAll = async (req, res) => {
   try {
@@ -42,6 +46,8 @@ exports.sendFriendRequest = async (req, res) => {
     })
     user.save()
     friendToAdd.save()
+    const notificationMessage = `${user.firstName} ${user.lastName} sent you a friend request`
+    await sendPushNotification(friendToAdd, notificationMessage)
     const message = `Successfully sent friend request to ${friendToAdd.firstName} ${friendToAdd.lastName}`
     res.send({ message })
   } catch (err) {
@@ -86,6 +92,8 @@ exports.respondToFriendRequest = async (req, res) => {
     friendToAdd.friendRequests = friendToAdd.friendRequests.filter(fr => fr._id.toString() !== user._id.toString())
     user.save()
     friendToAdd.save()
+    const notificationMessage = `${user.firstName} ${user.lastName} ${accept ? 'accepted' : 'declined'} your friend request`
+    await sendPushNotification(friendToAdd, notificationMessage)
     const message = `Successfully ${accept ? 'added' : 'declined'} ${friendToAdd.firstName} ${friendToAdd.lastName} as a friend`
     res.send({ message })
   } catch (err) {
@@ -151,5 +159,17 @@ exports.searchUser = async (req, res) => {
     res.send(result)
   } catch (err) {
     console.log(err)
+  }
+}
+
+const sendPushNotification = async (receiver, body) => {
+  const user = await usersController.findUserById(receiver._id)
+  if (user && Expo.isExpoPushToken(user.notificationToken)) {
+    await expo.sendPushNotificationsAsync([{
+      to: user.notificationToken,
+      sound: 'default',
+      title: 'Friend request',
+      body
+    }])
   }
 }
