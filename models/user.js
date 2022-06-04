@@ -54,7 +54,6 @@ const User = mongoose.model('User', userSchema)
 function validateUser(user) {
   const schema = {
     email: Joi.string()
-      .email()
       .required(),
     password: Joi.string()
       .min(8)
