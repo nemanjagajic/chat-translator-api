@@ -67,6 +67,13 @@ io.on('connection', socket => {
       })
     }
   })
+
+  socket.on('friendSentRequest', async userId => {
+    const friend = await usersController.findUserById(userId)
+    if (friend.socketId) {
+      socket.broadcast.to(friend.socketId).emit('newFriendRequest')
+    }
+  })
 })
 
 module.exports = server
