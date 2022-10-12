@@ -51,12 +51,15 @@ exports.getAll = async (req, res) => {
       const friend = chat.users.find(u => u._id.toString() !== user._id.toString())
       const me = chat.users.find(u => u._id.toString() === user._id.toString())
 
-      chatsWithUsers.push({
-        _id: chat._id,
-        lastMessage: chat.lastMessage,
-        friend,
-        me
-      })
+      const isFriend = !!user.friends.find(f => f._id.toString() === friend._id.toString())
+      if (isFriend) {
+        chatsWithUsers.push({
+          _id: chat._id,
+          lastMessage: chat.lastMessage,
+          friend,
+          me
+        })
+      }
     }
 
     res.send(chatsWithUsers)
