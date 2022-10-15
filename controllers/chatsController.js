@@ -33,6 +33,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
+    const showRemovedFriends = req.query.showRemovedFriends
 
     const chatUser = {
       _id: user._id,
@@ -52,7 +53,7 @@ exports.getAll = async (req, res) => {
       const me = chat.users.find(u => u._id.toString() === user._id.toString())
 
       const isFriend = !!user.friends.find(f => f._id.toString() === friend._id.toString())
-      if (isFriend) {
+      if (isFriend || showRemovedFriends === 'true') {
         chatsWithUsers.push({
           _id: chat._id,
           lastMessage: chat.lastMessage,
